@@ -1,11 +1,5 @@
-var http = require('http');
-var socket = require('socket.io');
-
-var server = http.createServer(function(req, res){
-
-});
-
-var io = socket(server);
+var server = require('http').createServer();
+var io = require('socket.io')(server);
 
 server.listen(8080);
 
