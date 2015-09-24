@@ -13,11 +13,5 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/carbonicTamale/socketServer.git"
-  },
-  "author": "",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/carbonicTamale/socketServer/issues"
-  },
-  "homepage": "https://github.com/carbonicTamale/socketServer#readme"
+  }
 }
