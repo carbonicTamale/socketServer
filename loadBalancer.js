@@ -30,7 +30,7 @@ LoadBalancer.prototype.insert = function(processName) {
       belowExp--;
     }
     //
-    
+
     var relativeWidth = topExp - belowExp;
     var relativeDistance = this.priorityQueue.length - belowExp;
 
@@ -83,27 +83,27 @@ LoadBalancer.prototype.swapIndicesOnArray= function(idx1, idx2, array) {
 // when a user adds load to the process doing the least amount of work,
 // make sure to increase the work count on the process and put process now doing
 // the least amount of work to the top of the tree.
-LoadBalancer.prototype.addLoadToBestProcess = function(processName) {
+LoadBalancer.prototype.addLoadToBestProcess = function() {
   var processTuple = this.findMin();
-  processTuple[0]++;
+  processTuple[1]++;
 
   var index = 0;
-  var direction = swapDirection(index, processTuple[1]);
+  var direction = this.swapDirection(index, processTuple[1]);
 
   while(direction) {
     var swapIdx;
 
     if(direction === 'left'){
-      swapIdx = leftChild(index);
+      swapIdx = this.leftChild(index);
     }
     else {
-      swapIdx = rightChild(index);
+      swapIdx = this.rightChild(index);
     }
 
-    swapIndicesOnArray(index, swapIdx, this.priorityQueue);
+    this.swapIndicesOnArray(index, swapIdx, this.priorityQueue);
     index = swapIdx;
 
-    direction = swapDirection(index, processTuple[1]);
+    direction = this.swapDirection(index, processTuple[1]);
   }
 
   return processTuple[0];
@@ -113,23 +113,22 @@ LoadBalancer.prototype.removeLoadFromProcess = function(processName) {
   var recurseDFS = function(index) {
     var curProcess = this.priorityQueue[index];
     if(curProcess[0] === processName) {
-      curProcess[1]++;
+      curProcess[1]--;
       return true;
     }
 
     var leftSwap = this.leftChild(index);
     var rightSwap = this.rightChild(index);
-    var child;
 
-    if(recurseDFS(leftSwap)) {
+    if(recurseDFS.call(this, leftSwap)) {
       if(this.priorityQueue[leftSwap][1] < curProcess[1]) {
-        swapIndicesOnArray(index, leftSwap, this.indicesArray);
+        this.swapIndicesOnArray.call(this, index, leftSwap, this.priorityQueue);
         return true;
       }
     }
-    else if(recurseDFS(rightSwap)) {
+    else if(recurseDFS.call(this, rightSwap)) {
       if(this.priorityQueue[rightSwap][1] < curProcess[1]) {
-        swapIndicesOnArray(index, rightSwap, this.indicesArray);
+        this.swapIndicesOnArray.call(this, index, rightSwap, this.priorityQueue);
         return true;
       }
     }
@@ -137,5 +136,10 @@ LoadBalancer.prototype.removeLoadFromProcess = function(processName) {
     return false;
   }
 
-  recurseDFS(0);
+  recurseDFS.call(this, 0);
 }
+
+var test = new LoadBalancer();
+test.insert("math");
+test.insert('two');
+test.insert('blaine');

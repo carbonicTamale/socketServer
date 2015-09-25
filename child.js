@@ -1,0 +1,1 @@
+socket.broadcast.emit(room + ' played', data);
