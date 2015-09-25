@@ -13,3 +13,12 @@ io.on('connection', function (socket) {
 });
 
 server.listen(8080);
+
+//do something when app is closing
+process.on('exit', loadBalancer.closeAllProcesses());
+
+//catches ctrl+c event
+process.on('SIGINT', loadBalancer.closeAllProcesses());
+
+//catches uncaught exceptions
+process.on('uncaughtException', loadBalancer.closeAllProcesses());

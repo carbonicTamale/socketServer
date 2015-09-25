@@ -11,6 +11,12 @@ var LoadBalancer = function() {
   this.insert('proc2');
 }
 
+LoadBalancer.prototype.closeAllProcesses = function() {
+  for(processName in processHash) {
+    processHash[processName].kill();
+  }
+}
+
 LoadBalancer.prototype.emit = function(data, room, socket) {
   var processToUse = this.addLoadToBestProcess();
   processHash[processToUse].send(data, room, socket);
