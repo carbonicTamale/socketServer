@@ -1,8 +1,8 @@
 var child_process = require('child_process');
 
 var processHash = {};
-processHash['proc1'] = child_process.fork('child.js');
-processHash['proc2'] = child_process.fork('child.js');
+processHash['proc1'] = child_process.fork('child.js', ['proc1']);
+processHash['proc2'] = child_process.fork('child.js', ['proc2']);
 
 var LoadBalancer = function() {
   this.priorityQueue = [];

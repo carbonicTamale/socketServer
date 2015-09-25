@@ -1,4 +1,4 @@
-var loadBalancer = require('loadBalancer.js');
+var loadBalancer = require('./loadBalancer.js');
 
 process.on('message', function(data, room, socket) {
   if(room) {
