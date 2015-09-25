@@ -1,8 +1,8 @@
 var child_process = require('child_process');
 
 var processHash = {};
-processHash['proc1'] = child_process.fork('child.js', ['proc1']);
-processHash['proc2'] = child_process.fork('child.js', ['proc2']);
+processHash['proc1'] = child_process.fork('./child.js', ['proc1']);
+processHash['proc2'] = child_process.fork('./child.js', ['proc2']);
 
 var LoadBalancer = function() {
   this.priorityQueue = [];
@@ -12,6 +12,8 @@ var LoadBalancer = function() {
 }
 
 LoadBalancer.prototype.closeAllProcesses = function() {
+  console.log('log');
+
   for(processName in processHash) {
     processHash[processName].kill();
   }
@@ -159,4 +161,6 @@ LoadBalancer.prototype.removeLoadFromProcess = function(processName) {
   recurseDFS.call(this, 0);
 }
 
-module.exports = LoadBalancer;
+var mod = new LoadBalancer();
+
+module.exports = mod;
