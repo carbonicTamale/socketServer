@@ -6,7 +6,6 @@ var loadBalancer = require('./loadBalancer.js')
 io.on('connection', function (socket) {
   socket.on('note event', function (data, room) {
     // check load balancer, determine which sub process to delegate emit to
-    console.log(data + " " + room);
     loadBalancer.emit(data, room, socket);
     return;
   });
