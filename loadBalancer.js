@@ -1,3 +1,8 @@
+var child_process = require('child_process');
+
+var proc1 = child_process.fork('child.js');
+var proc2 = child_process.fork('child.js');
+
 var LoadBalancer = function() {
   this.priorityQueue = [];
 }
@@ -139,7 +144,4 @@ LoadBalancer.prototype.removeLoadFromProcess = function(processName) {
   recurseDFS.call(this, 0);
 }
 
-var test = new LoadBalancer();
-test.insert("math");
-test.insert('two');
-test.insert('blaine');
+module.exports = LoadBalancer;
