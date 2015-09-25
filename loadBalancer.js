@@ -7,31 +7,47 @@ LoadBalancer.prototype.insert = function(processName) {
   this.priorityQueue[0] = [processName, 0];
 
   var recurseInsert = function(index, processTuple) {
-    if(index === this.priorityQueue.length) {
+    if(processTuple === undefined) {
+      return;
+    }
+
+    if(index > this.priorityQueue.length) {
+      return;
+    }
+    else if(index === this.priorityQueue.length) {
       this.priorityQueue[this.priorityQueue.length] = processTuple;
       return;
     }
 
-    // obtain the closest value equal to 2^n
-    var relativeLength = this.priorityQueue - index + 1;
-    var closestExp = relativeLength;
-    while(closestExp & (closestExp - 1) !== 0) {
-      closestExp++;
+    // obtain the closest relative value equal to 2^n
+    var topExp = this.priorityQueue.length;
+    while( (topExp & (topExp - 1)) !== 0 || topExp === 1) {
+      topExp++;
     }
-    if(relativeLength >= closestExp/2) {
+
+    var belowExp = this.priorityQueue.length - 1;
+    while( (belowExp & (belowExp - 1)) !== 0 && belowExp !== 0) {
+      belowExp--;
+    }
+    //
+    
+    var relativeWidth = topExp - belowExp;
+    var relativeDistance = this.priorityQueue.length - belowExp;
+
+    if( relativeDistance > relativeWidth/2) {
       var rightSwap = this.rightChild(index);
       var temp = this.priorityQueue[rightSwap];
       this.priorityQueue[rightSwap] = processTuple;
-      recurseInsert(rightSwap, temp);
+      recurseInsert.call(this, rightSwap, temp);
     } else {
       var leftSwap = this.leftChild(index);
       var temp = this.priorityQueue[leftSwap];
       this.priorityQueue[leftSwap] = processTuple;
-      recurseInsert(leftSwap, temp);
+      recurseInsert.call(this, leftSwap, temp);
     }
   }
 
-  recurseInsert(0, temp);
+  recurseInsert.call(this, 0, temp);
 }
 
 LoadBalancer.prototype.remove = function(processName) {
@@ -42,18 +58,18 @@ LoadBalancer.prototype.findMin = function() {
   return this.priorityQueue[0];
 }
 
-LoadBalancer.prototype.leftChild(i) = function() {
+LoadBalancer.prototype.leftChild = function(i) {
   return 2*i + 1;
 }
 
-LoadBalancer.prototype.rightChild(i) = function() {
+LoadBalancer.prototype.rightChild = function(i) {
   return 2*i + 2;
 }
 
-LoadBalancer.prototype.swapDirection(i, count) = function() {
-  if( count > this.priorityQueue[this.leftChild(i)][1] ) {
+LoadBalancer.prototype.swapDirection = function(i, count) {
+  if( this.leftChild(i) < this.priorityQueue.length && count > this.priorityQueue[this.leftChild(i)][1] ) {
     return 'left';
-  } else if( count > this.priorityQueue[this.rightChild(i)][1] ) {
+  } else if( this.rightChild(i) < this.priorityQueue.length && count > this.priorityQueue[this.rightChild(i)][1] ) {
     return 'right';
   }
 }
