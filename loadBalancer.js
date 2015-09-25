@@ -5,10 +5,37 @@ var LoadBalancer = function() {
 LoadBalancer.prototype.insert = function(processName) {
   var temp = this.priorityQueue[0];
   this.priorityQueue[0] = [processName, 0];
+
+  var recurseInsert = function(index, processTuple) {
+    if(index === this.priorityQueue.length) {
+      this.priorityQueue[this.priorityQueue.length] = processTuple;
+      return;
+    }
+
+    // obtain the closest value equal to 2^n
+    var relativeLength = this.priorityQueue - index + 1;
+    var closestExp = relativeLength;
+    while(closestExp & (closestExp - 1) !== 0) {
+      closestExp++;
+    }
+    if(relativeLength >= closestExp/2) {
+      var rightSwap = this.rightChild(index);
+      var temp = this.priorityQueue[rightSwap];
+      this.priorityQueue[rightSwap] = processTuple;
+      recurseInsert(rightSwap, temp);
+    } else {
+      var leftSwap = this.leftChild(index);
+      var temp = this.priorityQueue[leftSwap];
+      this.priorityQueue[leftSwap] = processTuple;
+      recurseInsert(leftSwap, temp);
+    }
+  }
+
+  recurseInsert(0, temp);
 }
 
 LoadBalancer.prototype.remove = function(processName) {
-
+  recurseDFS()
 }
 
 LoadBalancer.prototype.findMin = function() {
@@ -74,7 +101,7 @@ LoadBalancer.prototype.removeLoadFromProcess = function(processName) {
       return true;
     }
 
-    var leftSwap = this.leftChild(index)]);
+    var leftSwap = this.leftChild(index);
     var rightSwap = this.rightChild(index);
     var child;
 

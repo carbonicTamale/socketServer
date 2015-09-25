@@ -6,10 +6,6 @@ var child_process = require('child_process');
 var proc1 = child_process.fork('child.js');
 var proc2 = child_process.fork('child.js')
 
-var addSocketToLoadBalancer = function(socket) {
-  
-}
-
 io.on('connection', function (socket) {
   addSocketToLoadBalancer(socket);
 
