@@ -9,7 +9,7 @@ io.on('connection', function (socket) {
   socket.on('note played', function (data, room) {
     // check load balancer, determine which sub process to delegate
     // emit to
-    loadBalancer.emit(data, room);
+    loadBalancer.emit(data, room, socket);
   });
 });
 

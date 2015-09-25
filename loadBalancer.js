@@ -1,10 +1,19 @@
 var child_process = require('child_process');
 
-var proc1 = child_process.fork('child.js');
-var proc2 = child_process.fork('child.js');
+var processHash = {};
+processHash['proc1'] = child_process.fork('child.js');
+processHash['proc2'] = child_process.fork('child.js');
 
 var LoadBalancer = function() {
   this.priorityQueue = [];
+
+  this.insert('proc1');
+  this.insert('proc2');
+}
+
+LoadBalancer.prototype.emit = function(data, room, socket) {
+  var processToUse = this.addLoadToBestProcess();
+  processHash[processToUse].send(data, room, socket);
 }
 
 LoadBalancer.prototype.insert = function(processName) {

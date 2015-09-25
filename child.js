@@ -1,8 +1,8 @@
 var loadBalancer = require('loadBalancer.js');
 
-process.on('message', function(m, socket) {
-  if (m) {
+process.on('message', function(data, room, socket) {
+  if(room) {
     socket.broadcast.emit(room + ' played', data);
-    loadBalancer.removeLoadFromProcess(m);
+    loadBalancer.removeLoadFromProcess(room);
   }
 });
