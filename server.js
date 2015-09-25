@@ -1,12 +1,13 @@
 var server = require('http').createServer();
 var io = require('socket.io')(server);
 
-var loadBalancer = require('./loadBalancer.js')
+//var loadBalancer = require('./loadBalancer.js')
 
 io.on('connection', function (socket) {
   socket.on('note event', function (data, room) {
     // check load balancer, determine which sub process to delegate emit to
-    loadBalancer.emit(data, room, socket);
+    // loadBalancer.emit(data, room, socket);
+    socket.broadcast.emit(room + ' event', data);
     return;
   });
 });
