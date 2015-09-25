@@ -1,6 +1,5 @@
-process.on('message', function(data, room, socket) {
-  if(room) {
+process.on('message', function(m, data, room, socket) {
+  if(m === 'socket') {
     socket.broadcast.emit(room + ' event', data);
-    loadBalancer.removeLoadFromProcess(room);
   }
 });
