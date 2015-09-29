@@ -7,8 +7,8 @@ processHash['proc2'] = child_process.fork('./child.js', ['proc2']);
 var LoadBalancer = function() {
   this.priorityQueue = [];
 
-  this.insert('proc1');
-  this.insert('proc2');
+  // this.insert('proc1');
+  // this.insert('proc2');
 }
 
 LoadBalancer.prototype.closeAllProcesses = function() {
@@ -20,7 +20,7 @@ LoadBalancer.prototype.closeAllProcesses = function() {
 LoadBalancer.prototype.emit = function(data, room, socket) {
   var processToUse = this.addLoadToBestProcess();
 
-  processHash[processToUse].send('socket', [data, room, socket]);
+  //processHash[processToUse].send('socket', [data, room, socket]);
 
   loadBalancer.removeLoadFromProcess(processToUse);
 }
@@ -90,10 +90,12 @@ LoadBalancer.prototype.rightChild = function(i) {
 }
 
 LoadBalancer.prototype.swapDirection = function(i, count) {
-  if( this.leftChild(i) < this.priorityQueue.length && count > this.priorityQueue[this.leftChild(i)][1] ) {
-    return 'left';
-  } else if( this.rightChild(i) < this.priorityQueue.length && count > this.priorityQueue[this.rightChild(i)][1] ) {
-    return 'right';
+  if( this.priorityQueue[i] !== undefined ) {
+    if( this.priorityQueue[this.leftChild(i)] && count > this.priorityQueue[this.leftChild(i)][1] ) {
+      return 'left';
+    } else if( this.priorityQueue[this.rightChild(i)] && count > this.priorityQueue[this.rightChild(i)][1] ) {
+      return 'right';
+    }
   }
 }
 
@@ -137,6 +139,8 @@ LoadBalancer.prototype.removeLoadFromProcess = function(processName) {
     var curProcess = this.priorityQueue[index];
     if(curProcess[0] === processName) {
       curProcess[1]--;
+
+      // if cur process drops below 0 load, free process up
       return true;
     }
 
