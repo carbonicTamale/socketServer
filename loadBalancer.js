@@ -1,8 +1,8 @@
-var child_process = require('child_process');
+// var child_process = require('child_process');
 
-var processHash = {};
-processHash['proc1'] = child_process.fork('./child.js', ['proc1']);
-processHash['proc2'] = child_process.fork('./child.js', ['proc2']);
+// var processHash = {};
+// processHash['proc1'] = child_process.fork('./child.js', ['proc1']);
+// processHash['proc2'] = child_process.fork('./child.js', ['proc2']);
 
 var LoadBalancer = function() {
   this.priorityQueue = [];
@@ -42,27 +42,49 @@ LoadBalancer.prototype.insert = function(processName) {
       return;
     }
 
-    // obtain the closest relative value equal to 2^n
-    var topExp = this.priorityQueue.length;
+    // obtain the closest relative value equal to 2^n that is not 1
+    var topExp = this.priorityQueue.length + 1;
     while( (topExp & (topExp - 1)) !== 0 || topExp === 1) {
       topExp++;
     }
+    topExp--;
 
     var belowExp = this.priorityQueue.length - 1;
-    while( (belowExp & (belowExp - 1)) !== 0 && belowExp !== 0) {
+    while( (belowExp & (belowExp - 1)) !== 0 && belowExp !== 0 || belowExp === 1) {
       belowExp--;
     }
+    belowExp = belowExp - 1 < 0 ? 0 : belowExp;
     //
 
-    var relativeWidth = topExp - belowExp;
-    var relativeDistance = this.priorityQueue.length - belowExp;
+    console.log(belowExp + " " + topExp);
 
-    if( relativeDistance > relativeWidth/2) {
+    var relativeDistance = topExp - index;
+    var relativeWidth = topExp - belowExp;
+
+    console.log(relativeWidth + " " + relativeDistance + " " + index);
+
+    if(relativeWidth === 3) {
+      if(this.priorityQueue[this.leftChild(index)] === undefined) {
+        console.log("inserting left");
+        this.priorityQueue[this.leftChild(index)] = processTuple;
+      }
+      else {
+        console.log("inserting right");
+        this.priorityQueue[this.rightChild(index)] = processTuple;
+      }
+
+      return;
+    }
+
+    if( relativeDistance < relativeWidth/2) {
+      console.log("inserting right");
       var rightSwap = this.rightChild(index);
       var temp = this.priorityQueue[rightSwap];
       this.priorityQueue[rightSwap] = processTuple;
       recurseInsert.call(this, rightSwap, temp);
-    } else {
+    }
+    else {
+      console.log("inserting left");
       var leftSwap = this.leftChild(index);
       var temp = this.priorityQueue[leftSwap];
       this.priorityQueue[leftSwap] = processTuple;
@@ -74,7 +96,7 @@ LoadBalancer.prototype.insert = function(processName) {
 }
 
 LoadBalancer.prototype.remove = function(processName) {
-  recurseDFS()
+
 }
 
 LoadBalancer.prototype.findMin = function() {
@@ -168,4 +190,4 @@ LoadBalancer.prototype.removeLoadFromProcess = function(processName) {
 
 var mod = new LoadBalancer();
 
-module.exports = mod;
+// module.exports = mod;
