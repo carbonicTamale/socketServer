@@ -26,87 +26,30 @@ LoadBalancer.prototype.emit = function(data, room, socket) {
 }
 
 LoadBalancer.prototype.insert = function(processName) {
-  var temp = this.priorityQueue[0];
-  this.priorityQueue[0] = [processName, 0];
+  // perform dirty insert on the heap data structure
+  var lastOpenIdx = this.priorityQueue.length;
+  var processTuple = [processName, 0];
+  this.priorityQueue[lastOpenIdx] = processTuple;
 
+  // bubble the newly created process up the heap until it is at the top,
+  // adjusting the position of processes already in the heap accordingly
   var recurseInsert = function(index, processTuple) {
-    if(processTuple === undefined) {
+    var parentIndex = this.parent(index);
+
+    // base case to stop the insertion when we have reached the parent
+    if(parentIndex < 0) {
+      // this.priorityQueue[index] = processTuple;
       return;
     }
 
-    if(index > this.priorityQueue.length) {
-      return;
-    }
-    else if(index === this.priorityQueue.length) {
-      this.priorityQueue[this.priorityQueue.length] = processTuple;
-      return;
-    }
+    var temp = this.priorityQueue[parentIndex];
+    this.priorityQueue[parentIndex] = processTuple;
+    this.priorityQueue[index] = temp;
 
-    // obtain the closest relative value equal to 2^n that is not 1
-    var topExp = this.priorityQueue.length + 1;
-    while( (topExp & (topExp - 1)) !== 0 || topExp === 1) {
-      topExp++;
-    }
-
-    topExp *= 2;
-    topExp--;
-
-    var belowExp = this.priorityQueue.length;
-    while( (belowExp & (belowExp - 1)) !== 0 && belowExp !== 0 || belowExp === 1) {
-      belowExp--;
-    }
-    belowExp = belowExp - 1 < 0 ? 0 : belowExp;
-    //
-
-    console.log(belowExp + " " + topExp);
-
-    var relativeDistance = index - belowExp;
-    var relativeWidth = topExp - belowExp;
-
-    console.log(relativeWidth + " " + relativeDistance + " " + index);
-
-    if(relativeWidth === 3) {
-      if(this.priorityQueue[this.leftChild(index)] === undefined) {
-        console.log("inserting left");
-        this.priorityQueue[this.leftChild(index)] = processTuple;
-      }
-      else {
-        console.log("inserting right");
-        this.priorityQueue[this.rightChild(index)] = processTuple;
-      }
-
-      return;
-    }
-
-    if( relativeDistance < relativeWidth/2) {
-      console.log("inserting right");
-      var rightSwap = this.rightChild(index);
-      var temp = this.priorityQueue[rightSwap];
-
-      // if(this.priorityQueue[rightSwap] === undefined) {
-      //   this.priorityQueue[rightSwap] = temp;
-      // }
-      // else {
-        this.priorityQueue[rightSwap] = processTuple;
-        recurseInsert.call(this, rightSwap, temp);
-      // }
-    }
-    else {
-      console.log("inserting left");
-      var leftSwap = this.leftChild(index);
-      var temp = this.priorityQueue[leftSwap];
-
-      // if(this.priorityQueue[leftSwap] === undefined) {
-      //   this.priorityQueue[leftSwap] = temp;
-      // }
-      // else {
-        this.priorityQueue[leftSwap] = processTuple;
-        recurseInsert.call(this, leftSwap, temp);
-      // }
-    }
+    recurseInsert.call(this, parentIndex, processTuple);
   }
 
-  recurseInsert.call(this, 0, temp);
+  recurseInsert.call(this, lastOpenIdx, processTuple);
 }
 
 LoadBalancer.prototype.remove = function(processName) {
@@ -208,9 +151,10 @@ LoadBalancer.prototype.removeLoadFromProcess = function(processName) {
 
 var mod = new LoadBalancer();
 
-mod.insert('blaine');
+// mod.insert('blaine');
 // mod.insert('bowen');
 // mod.insert('tim');
 // mod.insert('test');
+// mod.insert('test2');
 
-// module.exports = mod;
+module.exports = mod;
