@@ -47,9 +47,11 @@ LoadBalancer.prototype.insert = function(processName) {
     while( (topExp & (topExp - 1)) !== 0 || topExp === 1) {
       topExp++;
     }
+
+    topExp *= 2;
     topExp--;
 
-    var belowExp = this.priorityQueue.length - 1;
+    var belowExp = this.priorityQueue.length;
     while( (belowExp & (belowExp - 1)) !== 0 && belowExp !== 0 || belowExp === 1) {
       belowExp--;
     }
@@ -58,7 +60,7 @@ LoadBalancer.prototype.insert = function(processName) {
 
     console.log(belowExp + " " + topExp);
 
-    var relativeDistance = topExp - index;
+    var relativeDistance = index - belowExp;
     var relativeWidth = topExp - belowExp;
 
     console.log(relativeWidth + " " + relativeDistance + " " + index);
@@ -80,15 +82,27 @@ LoadBalancer.prototype.insert = function(processName) {
       console.log("inserting right");
       var rightSwap = this.rightChild(index);
       var temp = this.priorityQueue[rightSwap];
-      this.priorityQueue[rightSwap] = processTuple;
-      recurseInsert.call(this, rightSwap, temp);
+
+      // if(this.priorityQueue[rightSwap] === undefined) {
+      //   this.priorityQueue[rightSwap] = temp;
+      // }
+      // else {
+        this.priorityQueue[rightSwap] = processTuple;
+        recurseInsert.call(this, rightSwap, temp);
+      // }
     }
     else {
       console.log("inserting left");
       var leftSwap = this.leftChild(index);
       var temp = this.priorityQueue[leftSwap];
-      this.priorityQueue[leftSwap] = processTuple;
-      recurseInsert.call(this, leftSwap, temp);
+
+      // if(this.priorityQueue[leftSwap] === undefined) {
+      //   this.priorityQueue[leftSwap] = temp;
+      // }
+      // else {
+        this.priorityQueue[leftSwap] = processTuple;
+        recurseInsert.call(this, leftSwap, temp);
+      // }
     }
   }
 
@@ -109,6 +123,10 @@ LoadBalancer.prototype.leftChild = function(i) {
 
 LoadBalancer.prototype.rightChild = function(i) {
   return 2*i + 2;
+}
+
+LoadBalancer.prototype.parent = function(i) {
+  return Math.floor((i-1)/2);
 }
 
 LoadBalancer.prototype.swapDirection = function(i, count) {
@@ -189,5 +207,10 @@ LoadBalancer.prototype.removeLoadFromProcess = function(processName) {
 }
 
 var mod = new LoadBalancer();
+
+mod.insert('blaine');
+// mod.insert('bowen');
+// mod.insert('tim');
+// mod.insert('test');
 
 // module.exports = mod;
