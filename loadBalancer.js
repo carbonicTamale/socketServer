@@ -52,8 +52,55 @@ LoadBalancer.prototype.insert = function(processName) {
   recurseInsert.call(this, lastOpenIdx, processTuple);
 }
 
-LoadBalancer.prototype.remove = function(processName) {
+LoadBalancer.prototype.promoteSubtree = function(index) {
 
+}
+
+LoadBalancer.prototype.remove = function(processName) {
+  var recurseDFS = function(name, index) {
+    var proc = this.priorityQueue[index];
+
+    if(proc[0] === processName) {
+      var leftIndex = this.leftChild(index);
+      var rightIndex = this.rightChild(index);
+      var leftChild = this.priorityQueue[leftIndex];
+      var rightChild = this.priorityQueue[rightIndex];
+
+      if(leftChild && rightChild ) {
+        if(leftChild[1] <= rightChild[1]) {
+          this.promoteSubtree(leftIndex);
+        }
+        else {
+          this.promoteSubtree(rightIndex);
+        }
+      }
+      else if(leftChild) {
+        this.promoteSubtree(leftIndex);
+      }
+      else if(rightChild) {
+        this.promoteSubtree(rightIndex);
+      }
+      else {
+        // the index has no children
+        delete this.priorityQueue[index];
+      }
+
+    }
+    else {
+      var leftIndex = this.leftChild(index);
+      var rightIndex = this.rightChild(index);
+
+      if(this.priorityQueue[leftIndex] !== undefined) {
+        recurseDFS.call(this, name, leftIndex);
+      }
+
+      if(this.priorityQueue[rightIndex] !== undefined) {
+        recurseDFS.call(this, name, rightIndex);
+      }
+    }
+  }
+
+  recurseDFS.call(this, processName, 0)
 }
 
 LoadBalancer.prototype.findMin = function() {
