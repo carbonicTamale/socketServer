@@ -61,20 +61,20 @@ LoadBalancer.prototype.promoteSubtree = function(index) {
   if(leftChild && rightChild ) {
     if(leftChild[1] <= rightChild[1]) {
       this.priorityQueue[index] = leftChild;
-      this.promoteSubtree(leftIndex);
+      this.promoteSubtree.call(this, leftIndex);
     }
     else {
       this.priorityQueue[index] = rightChild;
-      this.promoteSubtree(rightIndex);
+      this.promoteSubtree.call(this, rightIndex);
     }
   }
   else if(leftChild) {
     this.priorityQueue[index] = leftChild;
-    this.promoteSubtree(leftIndex);
+    this.promoteSubtree.call(this, leftIndex);
   }
   else if(rightChild) {
     this.priorityQueue[index] = rightChild;
-    this.promoteSubtree(rightIndex);
+    this.promoteSubtree.call(this, rightIndex);
   }
   else {
     // the index has no children, delete it from the array
@@ -87,7 +87,7 @@ LoadBalancer.prototype.remove = function(processName) {
     var proc = this.priorityQueue[index];
 
     if(proc[0] === processName) {
-      this.promoteSubtree(index);
+      this.promoteSubtree.call(this, index);
     }
     else {
       var leftIndex = this.leftChild(index);
