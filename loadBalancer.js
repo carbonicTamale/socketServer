@@ -53,7 +53,29 @@ LoadBalancer.prototype.insert = function(processName) {
 }
 
 LoadBalancer.prototype.promoteSubtree = function(index) {
+  var leftIndex = this.leftChild(index);
+  var rightIndex = this.rightChild(index);
+  var leftChild = this.priorityQueue[leftIndex];
+  var rightChild = this.priorityQueue[rightIndex];
 
+  if(leftChild && rightChild ) {
+    if(leftChild[1] <= rightChild[1]) {
+      this.promoteSubtree(leftIndex);
+    }
+    else {
+      this.promoteSubtree(rightIndex);
+    }
+  }
+  else if(leftChild) {
+    this.promoteSubtree(leftIndex);
+  }
+  else if(rightChild) {
+    this.promoteSubtree(rightIndex);
+  }
+  else {
+    // the index has no children, delete it from the array
+    delete this.priorityQueue[index];
+  }
 }
 
 LoadBalancer.prototype.remove = function(processName) {
@@ -61,30 +83,7 @@ LoadBalancer.prototype.remove = function(processName) {
     var proc = this.priorityQueue[index];
 
     if(proc[0] === processName) {
-      var leftIndex = this.leftChild(index);
-      var rightIndex = this.rightChild(index);
-      var leftChild = this.priorityQueue[leftIndex];
-      var rightChild = this.priorityQueue[rightIndex];
-
-      if(leftChild && rightChild ) {
-        if(leftChild[1] <= rightChild[1]) {
-          this.promoteSubtree(leftIndex);
-        }
-        else {
-          this.promoteSubtree(rightIndex);
-        }
-      }
-      else if(leftChild) {
-        this.promoteSubtree(leftIndex);
-      }
-      else if(rightChild) {
-        this.promoteSubtree(rightIndex);
-      }
-      else {
-        // the index has no children
-        delete this.priorityQueue[index];
-      }
-
+      this.promoteSubtree(index);
     }
     else {
       var leftIndex = this.leftChild(index);
