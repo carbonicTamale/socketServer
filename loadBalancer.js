@@ -60,16 +60,20 @@ LoadBalancer.prototype.promoteSubtree = function(index) {
 
   if(leftChild && rightChild ) {
     if(leftChild[1] <= rightChild[1]) {
+      this.priorityQueue[index] = leftChild;
       this.promoteSubtree(leftIndex);
     }
     else {
+      this.priorityQueue[index] = rightChild;
       this.promoteSubtree(rightIndex);
     }
   }
   else if(leftChild) {
+    this.priorityQueue[index] = leftChild;
     this.promoteSubtree(leftIndex);
   }
   else if(rightChild) {
+    this.priorityQueue[index] = rightChild;
     this.promoteSubtree(rightIndex);
   }
   else {
