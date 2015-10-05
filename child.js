@@ -1,6 +1,4 @@
-process.on('message', function(m, params) {
-  if(m === 'socket') {
-    // console.log(m, data, room, socket)
-    socket.broadcast.emit(room + ' event', data);
-  }
+process.on('message', function(m) {
+  console.log('CHILD Process received data: ' + m);
+  // socket.broadcast.emit(room + ' event', data);
 });

@@ -1,26 +1,29 @@
-var child_process = require('child_process');
+// var child_process = require('child_process');
+// var data;
+// var room;
+// var socket;
+var cluster = require('cluster');
+var numCPUs = require('os').cpus().length;
 
 var LoadBalancer = function() {
   this.priorityQueue = [];
-
-  this.insert('proc1');
-  this.insert('proc2');
-  this.insert('proc3');
-  this.insert('proc4');
-  this.insert('proc5');
-  this.insert('proc6');
-  this.insert('proc7');
-  this.insert('proc8');
-
   this.processHash = {};
-  this.processHash['proc1'] = child_process.fork('./child.js', ['proc1']);
-  this.processHash['proc2'] = child_process.fork('./child.js', ['proc2']);
-  this.processHash['proc3'] = child_process.fork('./child.js', ['proc3']);
-  this.processHash['proc4'] = child_process.fork('./child.js', ['proc4']);
-  this.processHash['proc5'] = child_process.fork('./child.js', ['proc5']);
-  this.processHash['proc6'] = child_process.fork('./child.js', ['proc6']);
-  this.processHash['proc7'] = child_process.fork('./child.js', ['proc7']);
-  this.processHash['proc8'] = child_process.fork('./child.js', ['proc8']);
+
+  for(var i = 1; i <= 8; i++) {
+    var procName = 'proc' + i;
+
+    // spawning child processes and added the child objects to hash for later
+    // reference
+    this.processHash[procName] = child_process.fork(__dirname + '/child.js');
+
+    // inserting the names of all 8 processes to our priority queue
+    this.insert(procName);
+
+    this.processHash[procName].on('message', function(m) {
+      console.log(m)
+      // socket.broadcast.emit(room + ' event', data);
+    });
+  }
 }
 
 LoadBalancer.prototype.closeAllProcesses = function() {
@@ -32,9 +35,20 @@ LoadBalancer.prototype.closeAllProcesses = function() {
 LoadBalancer.prototype.emit = function(data, room, socket) {
   var processToUse = this.addLoadToBestProcess();
 
-  this.processHash[processToUse].send('socket', [data, room, socket]);
+  // this.processHash[processToUse].send('socket');
+  console.log(socket.id);
+  // this.processHash[processToUse].send('message', data, room);
+  var obj = JSON.stringify({
+    'room': room,
+    'data': data,
+    'socket': socket
+  });
 
-  loadBalancer.removeLoadFromProcess(processToUse);
+  console.log(obj);
+
+  this.processHash[processToUse].send(obj);
+
+  this.removeLoadFromProcess(processToUse);
 }
 
 LoadBalancer.prototype.insert = function(processName) {
