@@ -42,7 +42,7 @@ if (cluster.isWorker) {
 
   socketIO.sockets.on('connection', function(socket, pseudo) {
     socket.on('note event', function (data, room) {
-      console.log(room + " " + data)
+      console.log(room + " " + data.key_num);
       socket.broadcast.emit(room + ' event', data);
       return;
     });
