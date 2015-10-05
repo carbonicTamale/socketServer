@@ -42,7 +42,7 @@ if (cluster.isWorker) {
 
   socketIO.sockets.on('connection', function(socket, pseudo) {
     socket.on('note event', function (data, room) {
-      // loadBalancer.emit(data, room, socket);
+      console.log(room + " " + data)
       socket.broadcast.emit(room + ' event', data);
       return;
     });
