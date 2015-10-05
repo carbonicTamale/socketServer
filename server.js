@@ -41,9 +41,6 @@ if (cluster.isWorker) {
   socketIO.adapter(redis({ host: _HostRedis, port: _portRedis }));
 
   socketIO.sockets.on('connection', function(socket, pseudo) {
-
-    socket.setNoDelay(true);
-
     console.log('nice');
 
     socket.on('note event', function (data, room) {
