@@ -4,6 +4,8 @@ var loadBalancer = require('../loadBalancer.js');
 
 describe('Load Balancer', function () {
   beforeEach(function() {
+    loadBalancer.priorityQueue = [];
+    loadBalancer.processHash = {};
     loadBalancer.insert('truffle');
     loadBalancer.insert('steak');
     loadBalancer.insert('poultry');
@@ -21,15 +23,13 @@ describe('Load Balancer', function () {
     loadBalancer.addLoadToBestProcess();
     loadBalancer.addLoadToBestProcess();
     loadBalancer.addLoadToBestProcess();
-    expect(loadBalancer.findMin()[0]).to.equal('truffle');
+    expect(loadBalancer.findMin()[0]).to.equal('poultry');
     done();
   });
 
   it('should correctly remove load from a process and reorganize tree' , function (done) {
-    console.log(loadBalancer);
     loadBalancer.removeLoadFromProcess('poultry');
     loadBalancer.removeLoadFromProcess('steak');
-    console.log(loadBalancer);
 
     done();
   });

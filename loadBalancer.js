@@ -1,26 +1,38 @@
-// var child_process = require('child_process');
-
-// var processHash = {};
-// processHash['proc1'] = child_process.fork('./child.js', ['proc1']);
-// processHash['proc2'] = child_process.fork('./child.js', ['proc2']);
+var child_process = require('child_process');
 
 var LoadBalancer = function() {
   this.priorityQueue = [];
 
-  // this.insert('proc1');
-  // this.insert('proc2');
+  this.insert('proc1');
+  this.insert('proc2');
+  this.insert('proc3');
+  this.insert('proc4');
+  this.insert('proc5');
+  this.insert('proc6');
+  this.insert('proc7');
+  this.insert('proc8');
+
+  this.processHash = {};
+  this.processHash['proc1'] = child_process.fork('./child.js', ['proc1']);
+  this.processHash['proc2'] = child_process.fork('./child.js', ['proc2']);
+  this.processHash['proc3'] = child_process.fork('./child.js', ['proc3']);
+  this.processHash['proc4'] = child_process.fork('./child.js', ['proc4']);
+  this.processHash['proc5'] = child_process.fork('./child.js', ['proc5']);
+  this.processHash['proc6'] = child_process.fork('./child.js', ['proc6']);
+  this.processHash['proc7'] = child_process.fork('./child.js', ['proc7']);
+  this.processHash['proc8'] = child_process.fork('./child.js', ['proc8']);
 }
 
 LoadBalancer.prototype.closeAllProcesses = function() {
-  for(processName in processHash) {
-    processHash[processName].kill();
+  for(processName in this.processHash) {
+    this.processHash[processName].kill();
   }
 }
 
 LoadBalancer.prototype.emit = function(data, room, socket) {
   var processToUse = this.addLoadToBestProcess();
 
-  //processHash[processToUse].send('socket', [data, room, socket]);
+  this.processHash[processToUse].send('socket', [data, room, socket]);
 
   loadBalancer.removeLoadFromProcess(processToUse);
 }
@@ -93,11 +105,11 @@ LoadBalancer.prototype.remove = function(processName) {
       var leftIndex = this.leftChild(index);
       var rightIndex = this.rightChild(index);
 
-      if(this.priorityQueue[leftIndex] !== undefined) {
+      if(this.priorityQueue[leftIndex]) {
         recurseDFS.call(this, name, leftIndex);
       }
 
-      if(this.priorityQueue[rightIndex] !== undefined) {
+      if(this.priorityQueue[rightIndex]) {
         recurseDFS.call(this, name, rightIndex);
       }
     }
@@ -145,6 +157,8 @@ LoadBalancer.prototype.addLoadToBestProcess = function() {
   var processTuple = this.findMin();
   processTuple[1]++;
 
+  // restrict sub processes to 8 process so that we will use up to 8 cores
+  // if we have more
   var index = 0;
   var direction = this.swapDirection(index, processTuple[1]);
 
@@ -169,9 +183,13 @@ LoadBalancer.prototype.addLoadToBestProcess = function() {
 
 LoadBalancer.prototype.removeLoadFromProcess = function(processName) {
   var recurseDFS = function(index) {
+    if(index >= this.priorityQueue.length) { return; }
+
     var curProcess = this.priorityQueue[index];
     if(curProcess[0] === processName) {
-      curProcess[1]--;
+      if(curProcess[1] > 0) {
+        curProcess[1]--;
+      }
 
       // if cur process drops below 0 load, free process up
       return true;
@@ -200,11 +218,5 @@ LoadBalancer.prototype.removeLoadFromProcess = function(processName) {
 }
 
 var mod = new LoadBalancer();
-
-// mod.insert('blaine');
-// mod.insert('bowen');
-// mod.insert('tim');
-// mod.insert('test');
-// mod.insert('test2');
 
 module.exports = mod;
