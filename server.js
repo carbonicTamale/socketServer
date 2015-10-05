@@ -41,10 +41,7 @@ if (cluster.isWorker) {
   socketIO.adapter(redis({ host: _HostRedis, port: _portRedis }));
 
   socketIO.sockets.on('connection', function(socket, pseudo) {
-    console.log('nice');
-
     socket.on('note event', function (data, room) {
-      console.log('yay');
       // loadBalancer.emit(data, room, socket);
       socket.broadcast.emit(room + ' event', data);
       return;
