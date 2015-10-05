@@ -74,8 +74,7 @@ if (cluster.isWorker) {
 
   http.globalAgent.maxSockets = Infinity;
 
-  var ent = require('ent'),
-      server = http.createServer().listen(_portSocket),
+  var server = http.createServer().listen(_portSocket),
       socketIO = require('socket.io').listen(server),
       redis = require('socket.io-redis');
 
